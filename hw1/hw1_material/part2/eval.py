@@ -8,6 +8,8 @@ import argparse
 import time
 from JBF import Joint_bilateral_filter
 
+from matplotlib import pyplot as plt
+
 
 def main():
     parser = argparse.ArgumentParser(description='evaluation function of joint bilateral filter')
@@ -34,6 +36,7 @@ def main():
     jbf_gt = cv2.cvtColor(cv2.imread(args.gt_jbf_path), cv2.COLOR_BGR2RGB)
     bf_error = np.sum(np.abs(bf_out.astype('int32')-bf_gt.astype('int32')))
     jbf_error = np.sum(np.abs(jbf_out.astype('int32')-jbf_gt.astype('int32')))
+
     print('[Error] Bilateral: %d\n[Error] Joint bilateral: %d'%
           (bf_error, jbf_error))
     
