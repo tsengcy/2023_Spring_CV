@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import argparse
 from DoG import Difference_of_Gaussian
+from matplotlib import pyplot as plt
 
 
 def plot_keypoints(img_gray, keypoints, save_path):
@@ -22,6 +23,17 @@ def main():
     ### TODO ###
     DoG = Difference_of_Gaussian(args.threshold)
     keypoints = DoG.get_keypoints(img)
+    
+
+    # print(keypoints)
+    plt.figure()
+    path = "./output/Q2_th_" + str(int(args.threshold)) + ".png"
+    plt.imshow(img, cmap="gray")
+    #plot feature
+    plt.scatter(keypoints[:,1], keypoints[:, 0], marker='.', c='r')
+    # plt.savefig(path, bbox_inches='tight', pad_inches=0)
+    plt.show()
+    # plt.close()
 
 if __name__ == '__main__':
     main()

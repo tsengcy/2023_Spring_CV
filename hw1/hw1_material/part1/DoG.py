@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 
 class Difference_of_Gaussian(object):
     def __init__(self, threshold):
@@ -35,10 +35,13 @@ class Difference_of_Gaussian(object):
             for j in range(self.num_DoG_images_per_octave):
                 dog_images.append(cv2.subtract(gaussian_images[self.num_guassian_images_per_octave*i + j + 1], gaussian_images[self.num_guassian_images_per_octave*i + j]))
 
-        # for i in range(len(dog_images)):
-        #     plt.figure(i)
-        #     plt.imshow(dog_images[i], cmap="gray")
-        # plt.show()
+                # plt.figure(i*self.num_DoG_images_per_octave+j)
+                # plt.imshow(dog_images[-1], cmap="gray")
+                # path = "./output/DoG" + str(i+1) + "_" + str(j+1) + ".png"
+                # plt.savefig(path, bbox_inches='tight', pad_inches=0)
+                # plt.close()
+
+
         # Step 3: Thresholding the value and Find local extremum (local maximun and local minimum)
         #         Keep local extremum as a keypoint
         memo = np.empty((0,2), int)

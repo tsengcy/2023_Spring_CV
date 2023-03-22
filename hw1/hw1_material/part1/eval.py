@@ -22,6 +22,8 @@ def main():
     
     # find keypoint from DoG and sort it
     keypoints = DoG.get_keypoints(img)
+
+    print(keypoints.shape)
     
     # read GT
     keypoints_gt = np.load(args.gt_path)
