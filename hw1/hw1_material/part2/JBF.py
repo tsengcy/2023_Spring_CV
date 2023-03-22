@@ -15,21 +15,69 @@ class Joint_bilateral_filter(object):
         padded_guidance = cv2.copyMakeBorder(guidance, self.pad_w, self.pad_w, self.pad_w, self.pad_w, BORDER_TYPE).astype(np.int32)
 
         ### TODO ###
-        #normalize the image
-        imgOrignal = float(padded_img) / 255
-        imgGuide = float(padded_guidance) / 255
+        #look up table
+        lookUpTable = np.exp(-np.arange(256) * np.arange(256) / (2*self.sigma_r**2 * 255**2))
+        
+        x, y = np.meshgrid(np.arange(self.wndw_size) - self.pad_w, np.arange(self.wndw_size) - self.pad_w)
 
-        #sptial kernel
+        kernel_s = np.exp(-(x * x + y * y) / (2*self.sigma_s**2))
 
+        if guidance.ndim == 3:
+            jFlag = True
+        else:
+            jFlag = False
+
+
+        # normalize
+        
         width = img.shape[1]
         height = img.shape[0]
 
-        imgafter = np.empty((height, width), float)
+        imgAfter = np.empty((height, width, 3), float)
 
-        for i in range(height):
-            for j in range(width):
+        # if not jFlag:
+        #     for i in range(self.pad_w, self.pad_w+height):
+        #         for j in range(self.pad_w, self.pad_w+width):
+        #             weight = lookUpTable[abs(padded_guidance[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1]- padded_guidance[i, j])] * kernel_s
+        #             denominator = np.sum(weight)
+        #             weight = weight / denominator
+        #             imgAfter[i-self.pad_w, j-self.pad_w, 0] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 0])
+        #             imgAfter[i-self.pad_w, j-self.pad_w, 1] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 1])
+        #             imgAfter[i-self.pad_w, j-self.pad_w, 2] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 2])
+        # else:
+        #     for i in range(self.pad_w, self.pad_w+height):
+        #         for j in range(self.pad_w, self.pad_w+width):
+        #             w = lookUpTable[abs(padded_guidance[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1]- padded_guidance[i, j])]
+                    
+        #             weight = w[:,:,0] * w[:,:,1] * w[:,:,2] * kernel_s
+        #             denominator = np.sum(weight) 
+        #             weight = weight / denominator
+        #             imgAfter[i-self.pad_w, j-self.pad_w, 0] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 0]) 
+        #             imgAfter[i-self.pad_w, j-self.pad_w, 1] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 1]) 
+        #             imgAfter[i-self.pad_w, j-self.pad_w, 2] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 2]) 
+
+
+        if not jFlag:
+            for i in range(self.pad_w, self.pad_w+height):
+                for j in range(self.pad_w, self.pad_w+width):
+                    weight = lookUpTable[abs(padded_guidance[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1]- padded_guidance[i, j])] * kernel_s
+                    denominator = np.sum(weight)
+                    weight = weight / denominator
+                    imgAfter[i-self.pad_w, j-self.pad_w, 0] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 0])
+                    imgAfter[i-self.pad_w, j-self.pad_w, 1] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 1])
+                    imgAfter[i-self.pad_w, j-self.pad_w, 2] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 2])
+        else:
+            for i in range(self.pad_w, self.pad_w+height):
+                for j in range(self.pad_w, self.pad_w+width):
+                    w = lookUpTable[abs(padded_guidance[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1]- padded_guidance[i, j])]
+                    
+                    weight = w[:,:,0] * w[:,:,1] * w[:,:,2] * kernel_s
+                    denominator = np.sum(weight) 
+                    weight = weight / denominator
+                    imgAfter[i-self.pad_w, j-self.pad_w, 0] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 0]) 
+                    imgAfter[i-self.pad_w, j-self.pad_w, 1] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 1]) 
+                    imgAfter[i-self.pad_w, j-self.pad_w, 2] = np.sum(weight*padded_img[i-self.pad_w:i+self.pad_w+1, j-self.pad_w:j+self.pad_w+1, 2]) 
                 
-
-
+        output = imgAfter
         
         return np.clip(output, 0, 255).astype(np.uint8)

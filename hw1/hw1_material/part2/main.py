@@ -16,7 +16,8 @@ def main():
     img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
     ### TODO ###
-
+    
+    print(img_gray.ndim)
 
 if __name__ == '__main__':
     main()
