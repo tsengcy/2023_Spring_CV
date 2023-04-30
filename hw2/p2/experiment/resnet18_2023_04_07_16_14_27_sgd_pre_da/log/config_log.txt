@@ -1,0 +1,7 @@
+Experiment Name = sgd_pre_da
+Model Type      = resnet18
+Num epochs      = 1
+Batch size      = 8192
+Use adam        = False
+Learning rate   = 0.01
+Scheduler step  = [32, 45, 60]
