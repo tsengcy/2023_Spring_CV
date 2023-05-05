@@ -20,6 +20,8 @@ def transform(img, canvas, corners):
     H = solve_homography(x, corners)
     
     return  warping(img, canvas, H, 0, h, 0, w, direction='f')
+    # print("aaaa", np.amin(corners[:,0]), np.amax(corners[:,0]), np.amin(corners[:,1]), np.amax(corners[:,1]))
+    # return  warping(img, canvas, H, np.amin(corners[:,1]), np.amax(corners[:,1]), np.amin(corners[:,0]), np.amax(corners[:,0]), direction='b')
 
 
 if __name__ == "__main__":
