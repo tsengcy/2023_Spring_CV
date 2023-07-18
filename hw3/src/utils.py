@@ -142,8 +142,12 @@ def warping(src, dst, H, ymin, ymax, xmin, xmax, direction='b'):
         # TODO: 3.apply H_inv to the destination pixels and retrieve (u,v) pixels, then reshape to (ymax-ymin),(xmax-xmin)
 
         newpixel = H_inv.dot(desPixel)
+
+        newpixel = newpixel / newpixel[-1]
         vx = np.floor(newpixel[0, :]).flatten().astype(int)
         vy = np.floor(newpixel[1, :]).flatten().astype(int)
+        # px = newpixel[0, :].flatten()
+        # py = newpixel[1, :].flatten()
         # print(vx)
         # print(vy)
 
@@ -155,10 +159,16 @@ def warping(src, dst, H, ymin, ymax, xmin, xmax, direction='b'):
 
         ux, uy = ux[mask], uy[mask]
         vx, vy = vx[mask], vy[mask]
-
+        # px, py = px[mask], py[mask]
         # TODO: 6. assign to destination image with proper masking
+        # print("ux", ux)
+        # print("uy", uy)
+
+        # print("vx", vx)
+        # print("vy", vy)
 
         dst[uy, ux] = src[vy, vx]
+        # dst[uy, ux] = merge(src, py, px)
 
     elif direction == 'f':
         # TODO: 3.apply H to the source pixels and retrieve (u,v) pixels, then reshape to (ymax-ymin),(xmax-xmin)
@@ -188,3 +198,14 @@ def warping(src, dst, H, ymin, ymax, xmin, xmax, direction='b'):
 
 
     return dst
+
+# def merge(img, ur, vr):
+#     u = np.floor(ur).astype(int)
+#     v = np.floor(vr).astype(int)
+#     print("u", u)
+#     print("v", v)
+#     paru = ur - u
+#     parv = vr - v
+#     print("paru", paru)
+#     print("parv", parv)
+#     return (img[u, v] * (1-paru) * (1-parv) + img[u+1, v] * paru * (1-parv) + img[u, v+1] * (1-paru) * parv + img[u+1, v+1] * paru * parv) 

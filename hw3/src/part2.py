@@ -21,6 +21,7 @@ def planarAR(REF_IMAGE_PATH, VIDEO_PATH):
     arucoDict = aruco.Dictionary_get(aruco.DICT_4X4_50)
     arucoParameters = aruco.DetectorParameters_create()
     ref_corns = np.array([[0, 0], [w, 0], [w, h], [0, h]])
+    # print(ref_corns.shape)
 
     # TODO: find homography per frame and apply backward warp
     pbar = tqdm(total = 353)
@@ -30,11 +31,23 @@ def planarAR(REF_IMAGE_PATH, VIDEO_PATH):
             # TODO: 1.find corners with aruco
             # function call to aruco.detectMarkers()
 
+            imgGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            corners, _, _ = cv2.aruco.detectMarkers(imgGray,arucoDict,parameters=arucoParameters)
+            
+
+            if len(corners) == 0:
+                break
+            else:
+                corner = corners[0].reshape(4,2)
+            # print("corners", corner)
             # TODO: 2.find homograpy
             # function call to solve_homography()
+            H = solve_homography(ref_corns, corner)
 
             # TODO: 3.apply backward warp
             # function call to warping()
+
+            warping(ref_image, frame, H, np.amin(corner[:,1]), np.amax(corner[:,1]), np.amin(corner[:,0]), np.amax(corner[:,0]), direction='b')
 
             videowriter.write(frame)
             pbar.update(1)
